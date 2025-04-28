@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:amazon_clone/presentation/theme/app_theme.dart';
 import 'package:amazon_clone/core/models/user_profile.dart';
 import 'package:amazon_clone/presentation/screens/edit_profile_screen.dart';
-
 import '../../core/services/preference_service.dart';
 import 'home_screen.dart';
 
@@ -28,11 +27,12 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> with Sing
       duration: const Duration(milliseconds: 300),
       vsync: this,
     );
+
     _currentUser = UserProfile(
       userId: '1',
       name: 'Arham Gufran',
       email: 'Recordsarham666@gmail.com',
-      profilePictureUrl: 'assets/images/WhatsApp Image 2025-02-13 at 14.49.49_621ea2fa.jpg',
+      profilePictureUrl: 'assets/images/profile.jpg',
     );
     _preferenceService = PreferenceServiceFactory.create();
     _loadThemePreference();
@@ -43,6 +43,15 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> with Sing
     setState(() {
       isDarkMode = isDark;
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    precacheImage(
+      AssetImage('assets/images/profile.jpg'),
+      context,
+    );
   }
 
   @override
@@ -209,7 +218,7 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> with Sing
 
   Widget _buildPersonalizedGreeting() {
     final hour = DateTime.now().hour;
-    final greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+    final greeting = hour < 12 ? 'Welcome' : hour < 18 ? 'Welcome' : 'Welcome';
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -254,8 +263,8 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> with Sing
                   ? AppTheme.darkTheme.primaryColor
                   : AppTheme.lightTheme.primaryColor,
               child: CircleAvatar(
-                radius: 46,
-                backgroundImage: const AssetImage('assets/images/WhatsApp Image 2025-02-13 at 14.49.49_621ea2fa.jpg'),
+                radius: 150,
+                backgroundImage: const AssetImage('assets/images/profile.jpg'),
               ),
             ),
             const SizedBox(height: 16),

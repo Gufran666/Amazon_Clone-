@@ -20,6 +20,7 @@ class _OrderTrackingMapScreenState extends State<OrderTrackingMapScreen> with Si
   late LatLng _currentLocation;
   late LatLng _deliveryLocation;
   int _remainingHours = 24;
+  bool _isMapLoaded = false;
 
   @override
   void initState() {
@@ -37,7 +38,6 @@ class _OrderTrackingMapScreenState extends State<OrderTrackingMapScreen> with Si
 
   @override
   void dispose() {
-    _mapController.dispose();
     _pulseController.dispose();
     super.dispose();
   }
@@ -119,22 +119,92 @@ class _OrderTrackingMapScreenState extends State<OrderTrackingMapScreen> with Si
         ),
         body: Stack(
           children: [
-            GoogleMap(
-              initialCameraPosition: CameraPosition(
-                target: _currentLocation,
-                zoom: 4,
+            if (_isMapLoaded)
+              GoogleMap(
+                initialCameraPosition: CameraPosition(
+                  target: _currentLocation,
+                  zoom: 4,
+                ),
+                markers: {_currentLocationMarker, _deliveryLocationMarker},
+                polylines: {_deliveryRoute},
+                onMapCreated: (controller) {
+                  _mapController = controller;
+                  _animateCameraToRoute();
+                  setState(() {
+                    _isMapLoaded = true;
+                  });
+                },
+                zoomControlsEnabled: true,
+                scrollGesturesEnabled: true,
+                rotateGesturesEnabled: true,
+                tiltGesturesEnabled: true,
               ),
-              markers: {_currentLocationMarker, _deliveryLocationMarker},
-              polylines: {_deliveryRoute},
-              onMapCreated: (controller) {
-                _mapController = controller;
-                _animateCameraToRoute();
-              },
-              zoomControlsEnabled: true,
-              scrollGesturesEnabled: true,
-              rotateGesturesEnabled: true,
-              tiltGesturesEnabled: true,
-            ),
+            if (!_isMapLoaded)
+              Center(
+                child: Card(
+                  elevation: 2,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.error_outline,
+                          size: 48,
+                          color: Colors.red,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Map Loading Error',
+                          style: TextStyle(
+                            fontFamily: 'RobotoCondensed',
+                            fontWeight: FontWeight.w700,
+                            fontSize: 20,
+                            color: AppTheme.darkTheme.textTheme.bodyLarge!.color,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'The map could not be loaded. Please check your internet connection and ensure your API key is properly configured.',
+                          style: TextStyle(
+                            fontFamily: 'OpenSans',
+                            fontWeight: FontWeight.w500,
+                            fontSize: 14,
+                            color: AppTheme.darkTheme.textTheme.bodyMedium!.color,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppTheme.darkTheme.primaryColor,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                            textStyle: const TextStyle(
+                              fontFamily: 'RobotoCondensed',
+                              fontWeight: FontWeight.w700,
+                              fontSize: 16,
+                            ),
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _isMapLoaded = false;
+                            });
+                            // Re-initialize the map or navigate back
+                          },
+                          child: const Text('Retry'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             Positioned(
               top: 20,
               right: 20,

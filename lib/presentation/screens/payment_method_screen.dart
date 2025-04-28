@@ -22,7 +22,7 @@ class PaymentMethodScreen extends StatefulWidget {
   State<PaymentMethodScreen> createState() => _PaymentMethodScreenState();
 }
 
-class _PaymentMethodScreenState extends State<PaymentMethodScreen> with SingleTickerProviderStateMixin {
+class _PaymentMethodScreenState extends State<PaymentMethodScreen> with TickerProviderStateMixin {
   late TabController _tabController;
   late AnimationController _securityIconController;
   late TextEditingController _cardNumberController;
@@ -120,7 +120,6 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> with SingleTi
             _buildDigitalWalletsTab(),
           ],
         ),
-        bottomNavigationBar: _buildBottomNavigationBar(context),
       ),
       routes: {
         '/home': (context) => const HomeScreen(),
@@ -407,18 +406,21 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> with SingleTi
                           size: 24,
                         ),
                         const SizedBox(width: 8),
-                        Text(
-                          'Your payment information is protected with encryption',
-                          style: TextStyle(
-                            fontFamily: 'OpenSans',
-                            fontWeight: FontWeight.w600,
-                            fontSize: 14,
-                            color: isDarkMode
-                                ? AppTheme.darkTheme.textTheme.bodyMedium!.color
-                                : AppTheme.lightTheme.textTheme.bodyMedium!.color,
+                        Expanded( // Prevents overflow
+                          child: Text(
+                            'Your payment information is protected with encryption',
+                            style: TextStyle(
+                              fontFamily: 'OpenSans',
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                              color: isDarkMode
+                                  ? AppTheme.darkTheme.textTheme.bodyMedium!.color
+                                  : AppTheme.lightTheme.textTheme.bodyMedium!.color,
+                            ),
+                            maxLines: 2, // Limits text to 5 lines
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                        const Spacer(),
                         ScaleTransition(
                           scale: CurvedAnimation(
                             parent: _securityIconController,
@@ -432,7 +434,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> with SingleTi
                             size: 24,
                           ),
                         ),
-                        const SizedBox(height: 24),
+                        const SizedBox(width: 24),
                         _buildContinueButton(),
                       ],
                     ),
@@ -639,31 +641,4 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> with SingleTi
     );
   }
 
-  BottomNavigationBar _buildBottomNavigationBar(BuildContext context) {
-    return BottomNavigationBar(
-      currentIndex: 3, // Set to 3 since this is the Orders screen
-      selectedItemColor: Colors.white,
-      unselectedItemColor: isDarkMode
-          ? AppTheme.darkTheme.textTheme.bodyMedium!.color
-          : AppTheme.lightTheme.textTheme.bodyMedium!.color,
-      showUnselectedLabels: true,
-      type: BottomNavigationBarType.fixed,
-      onTap: (index) {
-        switch (index) {
-          case 0: Navigator.pushNamed(context, '/home'); break;
-          case 1: Navigator.pushNamed(context, '/search'); break;
-          case 2: Navigator.pushNamed(context, '/cart'); break;
-          case 3: Navigator.pushNamed(context, '/orders'); break;
-          case 4: Navigator.pushNamed(context, '/profile'); break;
-        }
-      },
-      items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-        BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
-        BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: 'Cart'),
-        BottomNavigationBarItem(icon: Icon(Icons.reorder), label: 'Orders'),
-        BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-      ],
-    );
-  }
 }

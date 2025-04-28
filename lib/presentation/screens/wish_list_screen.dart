@@ -15,34 +15,7 @@ class WishListScreen extends StatefulWidget {
 
 class _WishListScreenState extends State<WishListScreen> with SingleTickerProviderStateMixin {
   late AnimationController _shareButtonController;
-  List<Product> wishListItems = [
-    Product(
-      id: '2',
-      name: 'Smart Watch',
-      price: 149.99,
-      imageUrl: 'assets/images/smartwatch.jpeg',
-      category: 'Electronics',
-      rating: 4.7,
-      description: 'Advanced smartwatch with heart rate monitoring, GPS, and fitness tracking.',
-      brand: 'SmartFit',
-      model: 'SF-Pro',
-      dimensions: '4x4x1 cm',
-      weight: 0.1,
-    ),
-    Product(
-      id: '3',
-      name: 'Bluetooth Speaker',
-      price: 79.99,
-      imageUrl: 'assets/images/speaker.jpg',
-      category: 'Electronics',
-      rating: 4.2,
-      description: 'Portable Bluetooth speaker delivering immersive 360° surround sound.',
-      brand: 'SoundWave',
-      model: 'SW-360',
-      dimensions: '18x10x10 cm',
-      weight: 0.8,
-    ),
-  ];
+  List<Product> wishListItems = [];
 
   bool _isSharing = false;
   bool isDarkMode = true;
@@ -52,6 +25,7 @@ class _WishListScreenState extends State<WishListScreen> with SingleTickerProvid
   @override
   void initState() {
     super.initState();
+    wishListItems = [];
     _shareButtonController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
@@ -80,7 +54,7 @@ class _WishListScreenState extends State<WishListScreen> with SingleTickerProvid
         _isSharing = true;
       });
       await Future.delayed(const Duration(milliseconds: 300));
-      // Share logic
+      // Implement sharing logic here
     } finally {
       setState(() {
         _isSharing = false;
@@ -161,42 +135,42 @@ class _WishListScreenState extends State<WishListScreen> with SingleTickerProvid
         PopupMenuButton<String>(
           onSelected: _sortWishList,
           itemBuilder: (context) => [
-            PopupMenuItem( // Changed from const
+            PopupMenuItem(
               value: 'Newest',
               child: Row(
                 children: [
                   Text('Newest'),
-                  if (_selectedSortOption == 'Newest') // Add this condition
+                  if (_selectedSortOption == 'Newest')
                     const Icon(Icons.check, color: Colors.white),
                 ],
               ),
             ),
-            PopupMenuItem( // Changed from const
+            PopupMenuItem(
               value: 'Price: Low to High',
               child: Row(
                 children: [
                   Text('Price: Low to High'),
-                  if (_selectedSortOption == 'Price: Low to High') // Add this
+                  if (_selectedSortOption == 'Price: Low to High')
                     const Icon(Icons.check, color: Colors.white),
                 ],
               ),
             ),
-            PopupMenuItem( // Changed from const
+            PopupMenuItem(
               value: 'Price: High to Low',
               child: Row(
                 children: [
                   Text('Price: High to Low'),
-                  if (_selectedSortOption == 'Price: High to Low') // Add this
+                  if (_selectedSortOption == 'Price: High to Low')
                     const Icon(Icons.check, color: Colors.white),
                 ],
               ),
             ),
-            PopupMenuItem( // Changed from const
+            PopupMenuItem(
               value: 'Rating',
               child: Row(
                 children: [
                   Text('Rating'),
-                  if (_selectedSortOption == 'Rating') // Add this
+                  if (_selectedSortOption == 'Rating')
                     const Icon(Icons.check, color: Colors.white),
                 ],
               ),
@@ -211,7 +185,7 @@ class _WishListScreenState extends State<WishListScreen> with SingleTickerProvid
         ),
         IconButton(
           icon: _isSharing
-              ? const SizedBox(
+              ? SizedBox(
             width: 24,
             height: 24,
             child: CircularProgressIndicator(
@@ -236,10 +210,10 @@ class _WishListScreenState extends State<WishListScreen> with SingleTickerProvid
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
-          _buildPersonalizedGreeting(),
           const SizedBox(height: 24),
+
           wishListItems.isEmpty
-              ? const Expanded(child: EmptyWishListIllustration())
+              ? const Expanded(child: EmptyWishListIllustration()) // ✅ Displays empty state when list is empty
               : Expanded(
             child: ListView.builder(
               itemCount: wishListItems.length,
@@ -251,46 +225,18 @@ class _WishListScreenState extends State<WishListScreen> with SingleTickerProvid
               },
             ),
           ),
+
           const SizedBox(height: 32),
         ],
       ),
     );
   }
 
-  Widget _buildPersonalizedGreeting() {
-    final hour = DateTime.now().hour;
-    final greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Expanded(
-            child: Text(
-              '$greeting!',
-              style: TextStyle(
-                fontFamily: 'OpenSans',
-                fontWeight: FontWeight.w800,
-                fontSize: 22,
-                color: Colors.white,
-              ),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.notifications_none),
-            color: Colors.white,
-            onPressed: () {},
-          ),
-        ],
-      ),
-    );
-  }
 
   BottomNavigationBar _buildBottomNavigationBar(BuildContext context) {
     return BottomNavigationBar(
-      currentIndex: 4, // Set to 4 since this is the Profile screen
+      currentIndex: 4,
       selectedItemColor: Colors.white,
       unselectedItemColor: isDarkMode
           ? AppTheme.darkTheme.textTheme.bodyMedium!.color
@@ -330,6 +276,7 @@ class EmptyWishListIllustration extends StatelessWidget {
             'assets/images/wishlist.jpg',
             width: 200,
             height: 200,
+            fit: BoxFit.contain,
           ),
           const SizedBox(height: 24),
           Text(
@@ -361,14 +308,14 @@ class EmptyWishListIllustration extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
               padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 28),
-              textStyle: TextStyle(
+              textStyle: const TextStyle(
                 fontFamily: 'RobotoCondensed',
                 fontWeight: FontWeight.w700,
                 fontSize: 16,
               ),
             ),
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.pushNamed(context, '/home');
             },
             child: const Text('Browse Products'),
           ),

@@ -366,8 +366,33 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             });
           },
         ),
-        _buildAppBarIcon(Icons.search, 1),
-        _buildAppBarIcon(Icons.shopping_cart, 2),
+        IconButton(
+          icon: const Icon(Icons.search),
+          onPressed: () {
+            setState(() => _currentIndex = 1);
+            Navigator.pushNamed(context, '/search');
+          },
+          color: _currentIndex == 1
+              ? isDarkMode ? AppTheme.darkTheme.primaryColor : AppTheme.lightTheme.primaryColor
+              : isDarkMode ? AppTheme.darkTheme.textTheme?.bodyLarge?.color : AppTheme.lightTheme.textTheme?.bodyLarge?.color,
+        ),
+        IconButton(
+          icon: const Icon(Icons.shopping_cart),
+          onPressed: () {
+            setState(() => _currentIndex = 2);
+            Navigator.pushNamed(context, '/cart');
+          },
+          color: _currentIndex == 2
+              ? isDarkMode ? AppTheme.darkTheme.primaryColor : AppTheme.lightTheme.primaryColor
+              : isDarkMode ? AppTheme.darkTheme.textTheme?.bodyLarge?.color : AppTheme.lightTheme.textTheme?.bodyLarge?.color,
+        ),
+        IconButton(
+          icon: const Icon(Icons.favorite_border), // Wishlist icon
+          onPressed: () {
+            Navigator.pushNamed(context, '/wishlist');
+          },
+          color: isDarkMode ? AppTheme.darkTheme.textTheme?.bodyLarge?.color : AppTheme.lightTheme.textTheme?.bodyLarge?.color,
+        ),
       ],
       bottom: TabBar(
         controller: _tabController,
@@ -382,23 +407,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         ),
         tabs: categories.map((category) => Tab(text: category)).toList(),
       ),
-    );
-  }
-
-  IconButton _buildAppBarIcon(IconData icon, int index) {
-    return IconButton(
-      icon: Icon(icon),
-      onPressed: () {
-        setState(() => _currentIndex = index);
-        switch (index) {
-          case 1: Navigator.pushNamed(context, '/search'); break;
-          case 2: Navigator.pushNamed(context, '/cart'); break;
-          default: Navigator.pushNamed(context, '/home');
-        }
-      },
-      color: _currentIndex == index
-          ? isDarkMode ? AppTheme.darkTheme.primaryColor : AppTheme.lightTheme.primaryColor
-          : isDarkMode ? AppTheme.darkTheme.textTheme?.bodyLarge?.color : AppTheme.lightTheme.textTheme?.bodyLarge?.color,
     );
   }
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:amazon_clone/presentation/theme/app_theme.dart';
 import 'package:amazon_clone/core/models/products.dart';
+import 'package:amazon_clone/presentation/screens/checkout_review_screen.dart';
 
 class ProductDetailScreen extends StatelessWidget {
   final Product product;
@@ -28,7 +29,7 @@ class ProductDetailScreen extends StatelessWidget {
             _buildRelatedProductsSection(),
           ],
         ),
-        bottomNavigationBar: _buildBottomBar(),
+        bottomNavigationBar: _buildBottomBar(context),
       ),
     );
   }
@@ -388,7 +389,7 @@ class ProductDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBottomBar() {
+  Widget _buildBottomBar(BuildContext context) {
     return Container(
       height: 80,
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
@@ -401,17 +402,40 @@ class ProductDetailScreen extends StatelessWidget {
       ),
       child: Row(
         children: [
-          _buildActionButton('Add to Cart', Icons.shopping_cart, onPressed: () {}),
+          _buildActionButton('Add to Cart', Icons.shopping_cart, onPressed: () {
+            _addToCart(context);
+          }),
           const SizedBox(width: 16),
           Expanded(
             child: _buildActionButton(
               'Buy Now',
               Icons.payment,
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const CheckoutReviewScreen(),
+                  ),
+                );
+              },
               isPrimary: true,
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  void _addToCart(BuildContext context) {
+    // Add your logic to add the product to the cart here
+    // For example:
+    // CartService.addProduct(product);
+
+    // Show a snackbar to confirm the item was added
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('${product.name} added to cart'),
+        duration: const Duration(seconds: 2),
       ),
     );
   }
