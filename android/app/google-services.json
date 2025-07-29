@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "38323191705",
+    "firebase_url": "https://clone-bf639-default-rtdb.firebaseio.com",
+    "project_id": "clone-bf639",
+    "storage_bucket": "clone-bf639.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:38323191705:android:ef14f651c20818ca589d08",
+        "android_client_info": {
+          "package_name": "com.example.amazon_clone"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "38323191705-6u285tg8kj7ou61b5nho590n7hh623pd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAxTn190t-rnd_Axj4C167upj85ADRreGg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "38323191705-6u285tg8kj7ou61b5nho590n7hh623pd.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

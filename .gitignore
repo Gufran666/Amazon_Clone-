@@ -25,3 +25,10 @@ build/
 *.swp
 *.swo
 *.zip
+
+.firebaserc
+firebase.json
+firestore.indexes.json
+firestore.rules
+supabase.env
+storage.rules

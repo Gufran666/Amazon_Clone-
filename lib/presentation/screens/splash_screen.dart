@@ -5,15 +5,18 @@ import 'package:flutter/services.dart';
 import 'package:lottie/lottie.dart';
 import 'package:amazon_clone/presentation/theme/app_theme.dart';
 import 'package:amazon_clone/presentation/screens/onboarding_screen.dart';
+import 'package:amazon_clone/presentation/providers/preference_provider.dart';
+import 'package:amazon_clone/presentation/providers/authentication_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class SplashScreen extends StatefulWidget {
+class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  ConsumerState<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen>
+class _SplashScreenState extends ConsumerState<SplashScreen>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _fadeAnimation;
@@ -46,7 +49,7 @@ class _SplashScreenState extends State<SplashScreen>
 
     _animateText();
 
-    Future.delayed(const Duration(seconds: 5), _navigateToNextScreen);
+    Future.delayed(const Duration(seconds: 5), _initializeApp);
   }
 
   @override
@@ -56,9 +59,28 @@ class _SplashScreenState extends State<SplashScreen>
     super.dispose();
   }
 
-  Future<void> _navigateToNextScreen() async {
+  void _initializeApp() async {
     HapticFeedback.lightImpact();
 
+    final prefService = ref.read(preferenceServiceProvider);
+    bool? isFirstTime = await prefService.getOnboarded();
+
+    if (isFirstTime == null || !isFirstTime!) {
+      _navigateToOnboarding();
+    } else {
+      final authProvider = ref.read(authenticationProvider.notifier);
+      await authProvider.initAuthStatus();
+
+      if (ref.read(authenticationProvider) == AuthState.success) {
+        _navigateToHomeScreen();
+      } else {
+        _navigateToAuthentication();
+      }
+    }
+  }
+
+
+  void _navigateToOnboarding() {
     if (mounted) {
       Navigator.pushReplacement(
         context,
@@ -70,6 +92,18 @@ class _SplashScreenState extends State<SplashScreen>
           transitionDuration: const Duration(milliseconds: 600),
         ),
       );
+    }
+  }
+
+  void _navigateToAuthentication() {
+    if (mounted) {
+      Navigator.pushReplacementNamed(context, '/authentication');
+    }
+  }
+
+  void _navigateToHomeScreen() {
+    if (mounted) {
+      Navigator.pushReplacementNamed(context, '/home');
     }
   }
 
@@ -121,7 +155,7 @@ class _SplashScreenState extends State<SplashScreen>
                       scale: value,
                       child: Lottie.asset(
                         'assets/animations/splash.json',
-                        width: 300, // Increased animation size
+                        width: 300,
                         height: 300,
                       ),
                     );
@@ -137,7 +171,7 @@ class _SplashScreenState extends State<SplashScreen>
                     style: TextStyle(
                       fontFamily: 'Montserrat',
                       fontWeight: FontWeight.w700,
-                      fontSize: 32, // Increased font size
+                      fontSize: 32,
                       color: Colors.white,
                     ),
                   ),
@@ -153,7 +187,7 @@ class _SplashScreenState extends State<SplashScreen>
                       _loadingText,
                       style: const TextStyle(
                         fontFamily: 'OpenSans',
-                        fontSize: 14, // Increased font size
+                        fontSize: 14,
                         color: Colors.white,
                       ),
                     ),

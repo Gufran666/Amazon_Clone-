@@ -1,21 +1,22 @@
+import 'package:amazon_clone/presentation/screens/authentication_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lottie/lottie.dart';
 import 'package:amazon_clone/presentation/theme/app_theme.dart';
-import 'package:amazon_clone/core/services/preference_service.dart';
-import 'package:amazon_clone/presentation/screens/home_screen.dart';
+import 'package:amazon_clone/presentation/providers/onboarding_providers.dart';
 
-class OnboardingScreen extends StatefulWidget {
+
+class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
 
   @override
-  State<OnboardingScreen> createState() => _OnboardingScreenState();
+  ConsumerState<OnboardingScreen>createState() => _OnboardingScreenState();
 }
 
-class _OnboardingScreenState extends State<OnboardingScreen>
+class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
     with SingleTickerProviderStateMixin {
   final PageController _pageController = PageController();
-  late final PreferenceService _preferenceService;
   late AnimationController _animationController;
 
   final List<Map<String, dynamic>> onboardingData = [
@@ -39,13 +40,27 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     },
   ];
 
-  int _currentPage = 0;
+  void _handleOnboardingCompletion(BuildContext context) async {
+    final prefService = ref.read(preferenceServiceProvider);
+    await prefService.setOnboarded(true);
+
+    print("navigating to auth screen");
+    _navigateToAuth(context);
+  }
+
+  void _navigateToAuth(BuildContext context) {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const AuthenticationScreen(isSignUp: false),
+      ),
+    );
+  }
+
 
   @override
   void initState() {
     super.initState();
-    _preferenceService = PreferenceServiceFactory.create();
-
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 800),
       vsync: this,
@@ -79,13 +94,15 @@ class _OnboardingScreenState extends State<OnboardingScreen>
             PageView.builder(
               controller: _pageController,
               itemCount: onboardingData.length,
-              onPageChanged: (index) => setState(() => _currentPage = index),
+              onPageChanged: (index) {
+                ref.read(onboardingPageIndexProvider.notifier).update((state) => index);
+              },
               itemBuilder: (context, index) {
                 return _buildOnboardingPage(onboardingData[index]);
               },
             ),
             _buildSkipButton(),
-            _buildBottomNavigation(),
+            _buildBottomNavigation(context),
           ],
         ),
       ),
@@ -93,6 +110,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
   }
 
   Widget _buildBackgroundGradient() {
+    final _currentPage = ref.watch(onboardingPageIndexProvider);
     return AnimatedContainer(
       duration: const Duration(milliseconds: 500),
       decoration: BoxDecoration(
@@ -157,10 +175,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
       top: 40,
       right: 20,
       child: TextButton(
-        onPressed: () async {
-          await _preferenceService.setOnboarded(true);
-          _navigateToHome();
-        },
+        onPressed: () => _handleOnboardingCompletion(context),
         child: const Text(
           'Skip',
           style: TextStyle(
@@ -173,7 +188,8 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     );
   }
 
-  Widget _buildBottomNavigation() {
+  Widget _buildBottomNavigation(BuildContext context) {
+    final _currentPage = ref.watch(onboardingPageIndexProvider);
     return Positioned(
       bottom: 40,
       left: 20,
@@ -218,10 +234,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              onPressed: () async {
-                await _preferenceService.setOnboarded(true);
-                _navigateToHome();
-              },
+              onPressed: () => _handleOnboardingCompletion(context),
               child: const Text(
                 'Get Started',
                 style: TextStyle(
@@ -245,16 +258,5 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     );
   }
 
-  void _navigateToHome() {
-    Navigator.pushReplacement(
-      context,
-      PageRouteBuilder(
-        pageBuilder: (_, animation, __) => const HomeScreen(),
-        transitionsBuilder: (_, animation, __, child) {
-          return ScaleTransition(scale: animation, child: child);
-        },
-        transitionDuration: const Duration(milliseconds: 700),
-      ),
-    );
-  }
+
 }

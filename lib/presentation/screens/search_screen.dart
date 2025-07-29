@@ -58,7 +58,7 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
     return [
       Product(
         id: '1',
-        name: 'Wireless Headphones',
+        name: 'Headphones',
         price: 99.99,
         imageUrl: 'assets/images/headphones.jpeg',
         category: 'Electronics',
@@ -255,8 +255,8 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
           hintText: 'Search products',
           hintStyle: TextStyle(
             color: isDarkMode
-                ? AppTheme.darkTheme.textTheme?.bodyMedium?.color
-                : AppTheme.lightTheme.textTheme?.bodyMedium?.color,
+                ? AppTheme.darkTheme.textTheme.bodyMedium?.color
+                : AppTheme.lightTheme.textTheme.bodyMedium?.color,
           ),
           prefixIcon: const Icon(Icons.search),
           suffixIcon: IconButton(
@@ -276,8 +276,8 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
         ),
         style: TextStyle(
           color: isDarkMode
-              ? AppTheme.darkTheme.textTheme?.bodyLarge?.color
-              : AppTheme.lightTheme.textTheme?.bodyLarge?.color,
+              ? AppTheme.darkTheme.textTheme.bodyLarge?.color
+              : AppTheme.lightTheme.textTheme.bodyLarge?.color,
         ),
         onSubmitted: (value) {
           _performSearch(value);
@@ -377,7 +377,7 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
     return BottomNavigationBar(
       currentIndex: 1, // Set to 1 since this is the Search screen
       selectedItemColor: Colors.white,
-      unselectedItemColor: AppTheme.darkTheme.textTheme?.bodyMedium?.color,
+      unselectedItemColor: AppTheme.darkTheme.textTheme.bodyMedium?.color,
       showUnselectedLabels: true,
       type: BottomNavigationBarType.fixed,
       onTap: (index) {
@@ -402,64 +402,90 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
 
 class ProductCard extends StatelessWidget {
   final Product product;
+  final bool isHorizontal;
+  final bool showDealTimer;
 
-  const ProductCard({super.key, required this.product});
+  const ProductCard({
+    super.key,
+    required this.product,
+    this.isHorizontal = false,
+    this.showDealTimer = false,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ProductDetailScreen(product: product),
+    final Color backgroundColor = Colors.cyan;
+    final Color textColor = Colors.white;
+
+    return SizedBox(
+      width: 400,
+      height: 420,
+      child: GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ProductDetailScreen(product: product),
+            ),
+          );
+        },
+        child: Card(
+          elevation: 6,
+          color: backgroundColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
           ),
-        );
-      },
-      child: Card(
-        elevation: 6,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(18),
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(15),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(
-                height: 200,
-                child: Image.asset(
-                  product.imageUrl ?? 'assets/images/placeholder.png',
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return _buildPlaceholderImage();
-                  },
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(15),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  height: isHorizontal ? 200 : 220,
+                  child: Image.asset(
+                    product.imageUrl ?? 'assets/images/placeholder.png',
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return _buildPlaceholderImage();
+                    },
+                  ),
                 ),
-              ),
-              SizedBox(
-                height: 100,
-                child: Padding(
+                if (showDealTimer)
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.access_time, size: 16, color: Colors.red),
+                        const SizedBox(width: 4),
+                        Text(
+                          'Ends in: 23:59:59',
+                          style: const TextStyle(fontSize: 12, color: Colors.red),
+                        ),
+                      ],
+                    ),
+                  ),
+                Padding(
                   padding: const EdgeInsets.all(8),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         product.name,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: 'Montserrat',
                           fontWeight: FontWeight.w700,
                           fontSize: 14,
-                          color: Colors.white,
+                          color: textColor,
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 12),
                       Row(
                         children: [
                           Text(
                             '\$${product.price.toStringAsFixed(2)}',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontFamily: 'OpenSans',
                               fontWeight: FontWeight.w600,
                               fontSize: 16,
@@ -471,7 +497,7 @@ class ProductCard extends StatelessWidget {
                           const SizedBox(width: 4),
                           Text(
                             '${product.rating}',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontFamily: 'OpenSans',
                               fontWeight: FontWeight.w600,
                               fontSize: 12,
@@ -483,8 +509,8 @@ class ProductCard extends StatelessWidget {
                     ],
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
